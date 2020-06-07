@@ -9,5 +9,8 @@ app.use(require('./producto'));
 app.use(require('./upload'));
 app.use(require('./imagenes'));
 app.use(require('./generador'));
+app.use(require('./empresa'));
+app.use(require('./configuracion'));
+app.use(require('./cliente'));
 
 module.exports = app;
