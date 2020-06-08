@@ -153,6 +153,43 @@ app.get('/cliente/:id', [verificaToken], (req, res) => {
         });
 });
 
+// Obtener Cliente por identificacion
+app.get('/cliente/buscar/:identificacion', [verificaToken], (req, res) => {
+    let identificacion = req.params.identificacion;
+    Cliente.find({ numeroIdentificacion: identificacion })
+        .populate('tipoIdentificacion', 'tipoIdentificacion codigo')
+        .exec((err, clienteDB) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            if (!clienteDB) {
+                return res.status(400).json({
+                    ok: false,
+                    err: {
+                        message: 'Cliente con esa identificacion no existe'
+                    }
+                });
+            }
+            //console.log({ clienteDB });
+            // if (clienteDB._id === undefined) {
+            //     return res.status(400).json({
+            //         ok: false,
+            //         err: {
+            //             message: 'Cliente con esa identificacion no existe'
+            //         }
+            //     });
+            // }
+            res.json({
+                ok: true,
+                cliente: clienteDB
+            });
+        });
+});
+
 // ==========================
 // Eliminar un cliente
 // ==========================
