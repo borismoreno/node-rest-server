@@ -20,7 +20,7 @@ app.post('/login', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: '(Usuario) o contrasena incorrectos'
+                    message: 'Usuario o contrasena incorrectos'
                 }
             });
         }
@@ -29,7 +29,7 @@ app.post('/login', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'Usuario o (contrasena) incorrectos'
+                    message: 'Usuario o contrasena incorrectos'
                 }
             });
         }

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        @font-face {
+            font-family: SourceSansPro;
+            src: local(SourceSansPro-Regular), url(SourceSansPro-Regular.ttf);
+        }
+        
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        a {
+            color: #0087C3;
+            text-decoration: none;
+        }
+        
+        body {
+            position: relative;
+            margin: 5mm;
+            color: #555555;
+            background: #FFFFFF;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-family: SourceSansPro;
+        }
+        
+        header {
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #AAAAAA;
+        }
+        
+        #logo {
+            float: left;
+            margin-top: 8px;
+        }
+        
+        #logo img {
+            height: 70px;
+        }
+        
+        #company {
+            float: right;
+            text-align: left;
+        }
+        
+        #cabecera {
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        #cabecera h1 {
+            font-size: 2.4em;
+            line-height: 1em;
+            font-weight: normal;
+            margin: 0 0 10px 0;
+        }
+        
+        #cabecera .date {
+            font-size: 1.1em;
+            color: #777777;
+        }
+        
+        #details {
+            margin-bottom: 10px;
+        }
+        
+        #resumen {
+            margin-bottom: 10px;
+        }
+        
+        #datos {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #AAAAAA;
+        }
+        
+        #client {
+            padding-left: 6px;
+            float: left;
+        }
+        
+        #subtotal {
+            float: left;
+            margin-left: 150px;
+        }
+        
+        #subtotal .titulo {
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        #client .to {
+            color: #777777;
+        }
+        
+        #client .name {
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        #client .titulo {
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        h2.name {
+            font-size: 1.4em;
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        #invoice {
+            float: right;
+            text-align: left;
+        }
+        
+        #totalizado {
+            float: right;
+            text-align: right;
+            margin-right: 20px;
+        }
+        
+        #totalizado .name {
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        #datosCliente {
+            float: left;
+            padding-left: 6px;
+            margin-bottom: 10px;
+        }
+        
+        #datosCliente .name {
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        #datosClienteAux {
+            float: right;
+            text-align: left;
+        }
+        
+        #datosClienteAux .name {
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        #invoice h1 {
+            color: #0087C3;
+            font-size: 2.4em;
+            line-height: 1em;
+            font-weight: normal;
+            margin: 0 0 10px 0;
+        }
+        
+        #invoice .date {
+            font-size: 1.1em;
+            color: #777777;
+        }
+        
+        #invoice .name {
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        table.table2 {
+            float: right;
+            text-align: left;
+            width: 50%;
+        }
+        
+        table.table2 th,
+        table.table2 td {
+            padding: 5px;
+            text-align: center;
+        }
+        
+        table.table3 {
+            float: left;
+            text-align: left;
+            width: 50%;
+        }
+        
+        table.table3 th,
+        table.table3 td {
+            padding: 5px;
+            text-align: left;
+        }
+        
+        table.table1 {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin-bottom: 10px;
+        }
+        
+        table.table1 th,
+        table.table1 td {
+            padding: 20px;
+            background: #EEEEEE;
+            text-align: center;
+            border-bottom: 1px solid #FFFFFF;
+        }
+        
+        table.table1 th {
+            white-space: nowrap;
+            font-weight: normal;
+        }
+        
+        table.table1 td {
+            text-align: right;
+        }
+        
+        table.table1 td h3 {
+            color: #57B223;
+            font-size: 1.2em;
+            font-weight: normal;
+            margin: 0 0 0.2em 0;
+        }
+        
+        table.table1 .noHead {
+            font-size: 1.0em;
+        }
+        
+        table.table1 .descHead {
+            text-align: center;
+        }
+        
+        table.table1 .unitHead {
+            font-size: 1.0em;
+            text-align: right;
+        }
+        
+        table.table1 .totalHead {
+            font-size: 1.0em;
+            text-align: right;
+        }
+        
+        table.table1 .no {
+            background: white;
+            font-size: 1.0em;
+            text-align: center;
+        }
+        
+        table.table1 .desc {
+            text-align: left;
+            background: white;
+        }
+        
+        table.table1 .unit {
+            text-align: right;
+            background: white;
+        }
+        
+        table.table1 .qtyTab {
+            background: white;
+            text-align: center;
+            font-size: 1.0em;
+        }
+        
+        table.table1 .total {
+            background: white;
+            text-align: right;
+        }
+        
+        table.table1 td.unit,
+        table.table1 td.qty,
+        table.table1 td.total {
+            font-size: 1.0em;
+        }
+        
+        table.table1 tbody tr:last-child td {
+            border-bottom: 1px solid #AAAAAA;
+        }
+        
+        table.table2 tfoot td {
+            padding: 10px 20px;
+            background: #FFFFFF;
+            border-bottom: none;
+            font-size: 1.2em;
+            white-space: nowrap;
+            border-top: 1px solid #AAAAAA;
+        }
+        
+        table.table2 tfoot tr:first-child td {
+            border-top: none;
+        }
+        
+        table.table2 tfoot tr:last-child td {
+            color: #57B223;
+            font-size: 1.4em;
+            border-top: 1px solid #57B223;
+        }
+        
+        table.table2 tfoot tr td:first-child {
+            border: none;
+        }
+        
+        #thanks {
+            font-size: 2em;
+            margin-bottom: 50px;
+        }
+        
+        #notices {
+            padding-left: 6px;
+            border-left: 6px solid #0087C3;
+        }
+        
+        #notices .notice {
+            font-size: 1.2em;
+        }
+        
+        footer {
+            color: #777777;
+            width: 100%;
+            height: 30px;
+            position: absolute;
+            bottom: 0;
+            border-top: 1px solid #AAAAAA;
+            padding: 8px 0;
+            text-align: center;
+        }
+    </style>
+    <meta charset="utf-8">
+    <title>Example 2</title>
+</head>
+
+<body>
+    <header class="clearfix">
+        <div id="cabecera" class="clearfix">
+            <div id="logo">
+                <img src="logo.png">
+            </div>
+            <div id="company">
+                <h1>Factura</h1>
+                <h1>{{informacion.numeroFactura}}</h1>
+                <div class="date">{{informacion.fecha}}</div>
+            </div>
+        </div>
+        <div id="details" class="clearfix">
+            <div id="client">
+                <h2 class="name">{{informacion.razonSocial}}</h2>
+                <h2 class="name">RUC {{informacion.ruc}}</h2>
+                <h2 class="name">{{informacion.nombreComercial}}</h2>
+                <div class="address">{{informacion.direccionEstablecimiento}}</div>
+                <div class="address">Contribuyente especial Nro {{informacion.contribuyenteEspecial}}</div>
+                <div class="address">Obligado a llevar contabilidad {{informacion.obligadoContabilidad}}</div>
+            </div>
+            <div id="invoice">
+                <div class="name">AUTORIZACION</div>
+                <div class="name">Numero: </div>
+                <div class="name">{{informacion.claveAcceso}}</div>
+                <div class="name">Ambiente: {{informacion.ambiente}}</div>
+                <div class="name">Emision: {{informacion.tipoEmision}}</div>
+                <div class="name">Clave de acceso</div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div id="datos" class="clearfix">
+            <div id="datosCliente">
+                <h2 class="name">{{informacion.razonCliente}}</h2>
+                <div class="name">{{informacion.tipoIdentificacionCliente}} {{informacion.identificacionCliente}}</div>
+                <div class="name">{{informacion.direccionCliente}}</div>
+                <div class="name">{{informacion.telefonoCliente}}</div>
+                <div class="name">{{informacion.emailCliente}}</div>
+            </div>
+            <div>
+                <table class="table2" border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                        <tr>
+                            <th>Metodo de pago</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each formasPago}}
+                        <tr>
+                            <td class="desc">
+                                {{this.formaPago}}
+                            </td>
+                            <td class="unit">{{this.total}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <table class="table1" border="0" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th class="noHead">Codigo</th>
+                    <th class="descHead">Descripcion</th>
+                    <th class="qty">Cantidad</th>
+                    <th class="unitHead">Precio Unitario</th>
+                    <th class="totalHead">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each detalles}}
+                <tr>
+                    <td class="no">{{this.codigoPrincipal}}</td>
+                    <td class="desc">
+                        {{this.descripcion}}
+                    </td>
+                    <td class="qtyTab">{{this.cantidad}}</td>
+                    <td class="unit">{{this.precioUnitario}}</td>
+                    <td class="total">{{this.totalSinImpuesto}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+
+        </table>
+        <div>
+            <table class="table3" border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th class="descHead">Nombre Adicional</th>
+                        <th class="unitHead">Valor Adicional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each adicionales}}
+                    <tr>
+                        <td class="desc">
+                            {{this.nombreAdicional}}
+                        </td>
+                        <td class="unit">{{this.valorAdicional}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div id="resumen" class="clearfix">
+            <div id="subtotal">
+                <div class="titulo">Subtotal 12%</div>
+                <div class="titulo">IVA</div>
+                <div class="titulo">TOTAL</div>
+            </div>
+            <div id="totalizado">
+                <div class="name">{{informacion.subTotalDoce}}</div>
+                <div class="name">{{informacion.valorIva}}</div>
+                <div class="name">{{informacion.valorTotal}}</div>
+            </div>
+        </div>
+        <!-- <div id="thanks">Thank you!</div> -->
+    </main>
+</body>
+
+</html>

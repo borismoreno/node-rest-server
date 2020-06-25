@@ -5,51 +5,122 @@ const path = require('path');
 const nodeMailer = require('nodemailer');
 let app = express();
 
-var testAccount = nodeMailer.createTestAccount();
-
-var users = [{
-        name: "Shyam",
-        age: "26"
+var detalles = [{
+        codigo: '001',
+        descripcion: 'Servicio de prueba uno',
+        cantidad: '2',
+        precioUnitario: '$104.00',
+        total: '$208.00'
     },
     {
-        name: "Navjot",
-        age: "26"
+        codigo: '002',
+        descripcion: 'Servicio de prueba dos',
+        cantidad: '3',
+        precioUnitario: '$100.00',
+        total: '$300.00'
     },
     {
-        name: "Vitthal",
-        age: "26"
+        codigo: '003',
+        descripcion: 'Servicio de prueba',
+        cantidad: '1',
+        precioUnitario: '$100.00',
+        total: '$100.00'
+    },
+    {
+        codigo: '003',
+        descripcion: 'Servicio de prueba',
+        cantidad: '1',
+        precioUnitario: '$100.00',
+        total: '$100.00'
+    },
+    {
+        codigo: '003',
+        descripcion: 'Servicio de prueba',
+        cantidad: '1',
+        precioUnitario: '$100.00',
+        total: '$100.00'
+    },
+    {
+        codigo: '003',
+        descripcion: 'Servicio de prueba',
+        cantidad: '1',
+        precioUnitario: '$100.00',
+        total: '$100.00'
     }
 ];
 
+var formasPago = [{
+        formaPago: 'OTROS CON UTILIZACION DEL SISTEMA FINANCIERO',
+        valor: '$1200.00'
+    },
+    {
+        formaPago: 'TARJETA DE CREDITO',
+        valor: '$100.00'
+    }
+];
+
+var adicionales = [{
+        nombre: 'ORDEN DE COMPRA',
+        valor: '1246555'
+    },
+    {
+        nombre: 'OTRO ADICIIONAL',
+        valor: '$100.00'
+    }
+];
+
+var imgSrc = 'file://' + __dirname + '../../assets/templates/';
+imgSrc = path.normalize(imgSrc);
+let pathLogo = path.resolve(__dirname, `../assets/templates/logo.png`);
+
 var informacion = {
-    nombre: 'Boris Moreno',
-    identificacion: '1718363938'
+    razonSocial: 'MARCO ARNALDO MORENO GUAMAN',
+    ruc: '1708051634001',
+    nombreComercial: 'INMAIN',
+    numeroFactura: '001-003-000000133',
+    direccionEstablecimiento: 'PASAJE MARIA GODOY OE1-25 Y AV. CACHA (CALDERON)',
+    contribuyenteEspecial: '',
+    obligadoContabilidad: 'NO',
+    claveAcceso: '1506202001170805163400120010010000007470000021911',
+    ambiente: 'PRUEBAS',
+    tipoEmision: 'NORMAL',
+    razonCliente: 'BORIS MORENO',
+    tipoIdentificacionCliente: 'CEDULA',
+    identificacionCliente: '1718363938',
+    direccionCliente: 'LA VICENTINA',
+    telefonoCliente: '0992703156',
+    emailCliente: 'boris_marco_moreno@hotmail.com',
+    fecha: '21 junio 2020',
+    subTotalDoce: '$1200.00',
+    valorIva: '$120.00',
+    valorTotal: '$1320.00',
+    pathLogo,
+    imgSrc
 };
 
 app.put('/generador', (req, res) => {
-    let pathTemplate = path.resolve(__dirname, `../assets/templates/template.html`);
+    let pathTemplate = path.resolve(__dirname, `../assets/templates/pdf-template.html`);
     let html = fs.readFileSync(pathTemplate, 'utf8');
     let options = {
-        format: 'Letter',
+        format: 'A4',
         orientation: 'portrait',
-        border: "10mm",
-        header: {
-            height: "45mm",
-            contents: '<div style="text-align: center;">Author: Boris Moreno</div>'
-        }
+        base: imgSrc
     };
+    console.log(options);
     let pathImg = path.resolve(__dirname, `../../uploads/output.pdf`);
     let document = {
         html: html,
         data: {
-            users,
-            informacion
+            informacion,
+            detalles,
+            formasPago,
+            adicionales
         },
         path: pathImg
     };
+    console.log(document);
     pdf.create(document, options)
         .then(respuesta => {
-            enviarMail(res);
             res.json({
                 ok: true,
                 message: 'Archivo generado'
@@ -64,59 +135,5 @@ app.put('/generador', (req, res) => {
             });
         });
 });
-
-function enviarMail(res) {
-    console.log({ testAccount });
-    var transporter = nodeMailer.createTransport({
-        // host: "smtp.ethereal.email",
-        // port: 587,
-        // secure: false, // true for 465, false for other ports
-        // auth: {
-        //     user: testAccount.user, // generated ethereal user
-        //     pass: testAccount.pass, // generated ethereal password
-        // },
-        service: 'Gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: {
-            user: 'borismoreno84',
-            pass: 'Mateito810'
-        },
-    });
-
-    var mailOptions = {
-        from: 'borismoreno84@gmail.com',
-        to: 'boris_marco_moreno@hotmail.com',
-        subject: 'Sending Email using Node.js',
-        text: 'That was easy!'
-    };
-
-    // transporter.sendMail({
-    //     from: '"Fred Foo 👻" <foo@example.com>', // sender address
-    //     to: "borismoreno84@gmail.com, boris_marco_moreno@hotmail.com", // list of receivers
-    //     subject: "Hello ✔", // Subject line
-    //     text: "Hello world?", // plain text body
-    //     html: "<b>Hello world?</b>", // html body
-    // });
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log('error');
-            console.log({ error });
-            return res.status(500).json({
-                ok: false,
-                error
-            });
-        } else {
-            console.log('ok');
-            return res.json({
-                ok: true,
-                message: 'Email sent: ' + info.response
-            });
-        }
-    });
-}
 
 module.exports = app;

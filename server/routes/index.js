@@ -12,5 +12,6 @@ app.use(require('./generador'));
 app.use(require('./empresa'));
 app.use(require('./configuracion'));
 app.use(require('./cliente'));
+app.use(require('./comprobantes'));
 
 module.exports = app;

@@ -37,6 +37,10 @@ let usuarioSchema = new Schema({
     google: {
         type: Boolean,
         default: false
+    },
+    empresa: {
+        type: Schema.Types.ObjectId,
+        ref: 'Empresa'
     }
 });
 

@@ -3,7 +3,7 @@ const express = require('express');
 const { verificaToken, verificaAdminRol } = require('../middlewares/autenticacion');
 const path = require('path');
 const fs = require('fs');
-app = express();
+const app = express();
 
 // app.use(fileUpLoad({ useTempFiles: true }));
 
@@ -150,7 +150,93 @@ app.post('/empresa', [verificaToken, verificaAdminRol], (req, res) => {
     });
 });
 
-function borrarArchivo(nombreArchivo, tipo) {
+app.put('/empresa/:tipo/:id', (req, res) => {
+    let tipo = req.params.tipo;
+    let id = req.params.id;
+    if (!req.files) {
+        return res.status(400).json({
+            ok: false,
+            err: {
+                message: 'No se ha enviado ningun archivo'
+            }
+        });
+    }
+
+    let tiposValidos = ['logos', 'certificados'];
+    if (tiposValidos.indexOf(tipo) < 0) {
+        return res.status(400).json({
+            ok: false,
+            message: 'Tipo no permitido ' + tiposValidos.join(' ')
+        });
+    }
+
+    let extensionesValidas = ['png', 'jpg', 'gif', 'jpeg', 'p12'];
+    let sampleFile = req.files.archivo;
+    let nombreArchivo = sampleFile.name.split('.');
+    let extension = nombreArchivo[nombreArchivo.length - 1];
+    if (extensionesValidas.indexOf(extension.toLowerCase()) < 0) {
+        return res.status(400).json({
+            ok: false,
+            message: 'Tipo de archivo no permitido ' + extensionesValidas.join(' '),
+            ext: extension
+        });
+    }
+
+    //Cambiar nombre archivo
+    let nombreArch = sampleFile.name;
+
+    console.log(nombreArch);
+
+    sampleFile.mv(`uploads/${tipo}/${nombreArch}`, (err) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        //Aqui ya se carga la imagen
+        if (tipo === 'certificados')
+            cargaCertificado(id, res, nombreArch);
+        // else
+        //     imagenProducto(id, res, nombreArch);
+    })
+});
+
+function cargaCertificado(id, res, nombreArch) {
+    Empresa.findById(id, (err, empresaDB) => {
+        if (err) {
+            borraArchivo(nombreArch, 'certificados');
+            return res.status(500).json({
+                ok: false,
+                err
+            })
+        }
+
+        if (!empresaDB) {
+            borraArchivo(nombreArch, 'certificados');
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'Usuario no existe'
+                }
+            })
+        }
+
+        borraArchivo(empresaDB.pathCertificado, 'certificados');
+
+        empresaDB.pathCertificado = nombreArch;
+        empresaDB.save((err, empresaGuardada) => {
+            res.json({
+                ok: true,
+                message: 'Empresa guardada',
+                img: nombreArch
+            })
+        })
+    });
+}
+
+function borraArchivo(nombreArchivo, tipo) {
     let pathImg = path.resolve(__dirname, `../../uploads/${tipo}/${nombreArchivo}`);
     if (fs.existsSync(pathImg)) {
         fs.unlinkSync(pathImg);

@@ -10,16 +10,29 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "axios": "^0.19.2",
         "bcrypt": "^4.0.1",
         "body-parser": "^1.19.0",
+        "btoa": "^1.2.1",
+        "canvas": "^2.6.1",
         "cors": "^2.8.5",
+        "easy-soap-request": "^3.3.1",
         "express": "^4.17.1",
         "express-fileupload": "^1.1.7-alpha.3",
+        "file-api": "^0.10.4",
+        "filereader": "^0.10.3",
+        "jsbarcode": "^3.11.0",
         "jsonwebtoken": "^8.5.1",
+        "moment": "^2.26.0",
         "mongoose": "^5.9.17",
         "mongoose-unique-validator": "^2.0.3",
+        "node-forge": "^0.9.1",
         "nodemailer": "^6.4.8",
         "pdf-creator-node": "^1.4.1",
-        "underscore": "^1.10.2"
+        "soap": "^0.31.0",
+        "underscore": "^1.10.2",
+        "window": "^4.2.7",
+        "xml-crypto": "^1.5.3",
+        "xmlbuilder": "^15.1.1"
     }
 }

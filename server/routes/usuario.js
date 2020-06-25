@@ -42,7 +42,8 @@ app.post('/usuario', [verificaToken, verificaAdminRol], (req, res) => {
         nombre: body.nombre,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
-        rol: body.rol
+        rol: body.rol,
+        empresa: body.empresa
     });
 
     usuario.save((err, usuarioDb) => {
