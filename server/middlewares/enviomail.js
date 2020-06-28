@@ -1,5 +1,6 @@
 let FacturaEmitida = require('../models/facturaemitida');
 const path = require('path');
+const fs = require('fs');
 const mailComposer = require('mailcomposer');
 var nodeses = require('node-ses'),
     client = nodeses.createClient({ key: process.env.API_KEY_SES, secret: process.env.SECRET_SES });
@@ -45,18 +46,33 @@ let envioMail = async(claveAcceso, res) => {
                     const { statusCode, statusMessage, body } = respuesta;
                     if (err)
                         res.send(err);
-                    else
-                        res.status(200).json({
-                            ok: true,
-                            message: 'Factura Generada',
-                            statusCode,
-                            statusMessage
-                        });
+                    else {
+                        res.sendFile(pdf_path);
+                        //borraArchivos(claveAcceso);
+                        // res.status(200).json({
+                        //     ok: true,
+                        //     message: 'Factura Generada',
+                        //     statusCode,
+                        //     statusMessage
+                        // });
+                    }
                 }
             )
         }
 
     });
+}
+
+let borraArchivos = async(claveAcceso) => {
+    let pathPdf = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
+    if (fs.existsSync(pathPdf)) {
+        fs.unlinkSync(pathPdf);
+    }
+
+    // let pathXml = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
+    // if (fs.existsSync(pathXml)) {
+    //     fs.unlinkSync(pathXml);
+    // }
 }
 
 let obtenerDatos = async(claveAcceso) => {
