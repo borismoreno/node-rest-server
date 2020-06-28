@@ -14,7 +14,6 @@ const soapRequest = require('easy-soap-request');
 const FileAPI = require('file-api'),
     File = FileAPI.File,
     FileReader = FileAPI.FileReader;
-var SignedXml = require('xml-crypto').SignedXml
 app = express();
 
 let FacturaEmitida = require('../models/facturaemitida');
@@ -25,8 +24,6 @@ let ImpuestoComprobante = require('../models/impuestocomprobante');
 let DetalleFacturaEmitida = require('../models/detallefacturaemitida');
 let FormaPagoFactura = require('../models/formapagofactura');
 let DatoAdicionalFactura = require('../models/datoadicionalfactura');
-const empresa = require('../models/empresa');
-const facturaemitida = require('../models/facturaemitida');
 
 let getEmpresa = async(id) => {
     let empresa;
@@ -34,6 +31,13 @@ let getEmpresa = async(id) => {
         empresa = empresaDB;
     });
     return empresa;
+}
+
+function borraArchivo(claveAcceso) {
+    let pathImg = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
+    if (fs.existsSync(pathImg)) {
+        fs.unlinkSync(pathImg);
+    }
 }
 
 let firma = async(clave, res) => {
@@ -63,10 +67,7 @@ let firma = async(clave, res) => {
         (async() => {
             const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
             const { body, statusCode } = response;
-            console.log('codigo recepcion: ', statusCode);
-            console.log('body recepcion: ', body);
             if (statusCode == '200') {
-                console.log('entra autorizacion');
                 setTimeout(() => {
                     url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
                     xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
@@ -81,15 +82,9 @@ let firma = async(clave, res) => {
                     (async() => {
                         const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
                         const { body, statusCode } = response;
-                        // console.log(statusCode);
-                        // console.log(body);
-                        let resultado = body.toString(); //.replace('&lt;', '<');
-                        res.status(200).json({
-                            ok: true,
-                            message: 'Archivo generado',
-                            resp: response
-                        });
-                        //console.log(response.toString().replace('&lt;', '<'));
+                        let resultado = body.toString();
+                        await envioMail(clave, res);
+                        //borraArchivo(clave);
                     })();
                 }, 3000);
             }
@@ -375,6 +370,7 @@ let guardarFactura = async(body, usuario, res) => {
     let fechaAuxiliar = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
     let empresaDB = await getEmpresa(body.empresa);
     let tipoIdentificacion = await getTipoIdentificacion(body.cliente.tipoIdentificacion);
+    let clienteEmision = await consultarCliente(body.cliente.numeroIdentificacion);
     let secuencial = pad.substring(0, pad.length - empresaDB.secuencialFactura.length) + empresaDB.secuencialFactura;
     let claveAcceso = fecha[2] + fecha[1] + fecha[0] +
         '01' + empresaDB.ruc + empresaDB.ambiente + empresaDB.establecimiento + empresaDB.puntoEmision +
@@ -409,7 +405,8 @@ let guardarFactura = async(body, usuario, res) => {
         estadoComprobante: 'PPR',
         fechaRegistro: new Date(),
         usuario: usuario._id,
-        empresa: empresaDB._id
+        empresa: empresaDB._id,
+        cliente: clienteEmision._id
     });
     let facturaDB = await guardarFacturaEmitida(factura);
     impuestoComprobante = new ImpuestoComprobante({
@@ -432,13 +429,11 @@ let guardarFactura = async(body, usuario, res) => {
     fs.writeFileSync(pathXML, xmlGenerado);
     let respuesta = await firma(claveAcceso, res)
     let identificacion = facturaDB.identificacionComprador;
-    let clienteDB = await consultarCliente(identificacion);
-    let informacionPdf = await cargarInformacion(facturaDB, clienteDB);
+    // let clienteDB = await consultarCliente(identificacion);
+    let informacionPdf = await cargarInformacion(facturaDB, clienteEmision);
 
-    //let pdf = await generarPdf(claveAcceso, informacionPdf, detalles, res)
     let pdf = await generarPdf(claveAcceso, informacionPdf, detalles, formasPago, datosAdicionales, res)
 
-    console.log('respuesta', respuesta);
     return claveAcceso;
 }
 

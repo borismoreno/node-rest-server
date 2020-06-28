@@ -2,7 +2,6 @@ const express = require('express');
 const fs = require('fs');
 const pdf = require('pdf-creator-node');
 const path = require('path');
-const nodeMailer = require('nodemailer');
 let app = express();
 
 var detalles = [{

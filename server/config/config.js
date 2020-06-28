@@ -30,3 +30,21 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 process.env.URL_DB = urlDB;
+
+let apiKeySes;
+if (process.env.NODE_ENV === 'dev') {
+    apiKeySes = '******************';
+} else {
+    apiKeySes = process.env.API_KEY_SES;
+}
+
+process.env.API_KEY_SES = apiKeySes;
+
+let secretSes;
+if (process.env.NODE_ENV === 'dev') {
+    secretSes = '************************';
+} else {
+    secretSes = process.env.SECRET_SES;
+}
+
+process.env.SECRET_SES = secretSes;

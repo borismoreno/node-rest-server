@@ -36,6 +36,7 @@ var facturaEmitidaSchema = new Schema({
     fechaRecibido: { type: Date, required: false },
     fechaAutorizacion: { type: Date, required: false },
     empresa: { type: Schema.Types.ObjectId, ref: 'Empresa' },
+    cliente: { type: Schema.Types.ObjectId, ref: 'Cliente' },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' }
 })
 
