@@ -65,6 +65,8 @@ let firma = async(clave, res) => {
             "</SOAP-ENV:Envelope>";
         // usage of module
         (async() => {
+            console.log('URL:', url);
+            console.log('XML:', xml);
             const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
             const { body, statusCode } = response;
             console.log('Respuesta recpecion:', response);
