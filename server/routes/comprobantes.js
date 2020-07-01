@@ -67,6 +67,9 @@ let firma = async(clave, res) => {
         (async() => {
             const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
             const { body, statusCode } = response;
+            console.log('Respuesta recpecion:', response);
+            console.log('Respuesta statusCode:', statusCode);
+            console.log('Respuesta body:', body);
             if (statusCode == '200') {
                 setTimeout(() => {
                     url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
