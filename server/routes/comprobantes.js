@@ -150,6 +150,11 @@ let getTipoIdentificacion = async(tipoIdentificacion) => {
     return tipo;
 }
 
+let getTipoIdentificacionCodigo = async(codigoTipoIdentificacion) => {
+    let tipo = await TipoIdentificacion.find({ codigo: codigoTipoIdentificacion });
+    return tipo[0];
+}
+
 let guardarFacturaEmitida = async(factura) => {
     let fac = await factura.save();
     return fac;
@@ -380,7 +385,11 @@ let generarPdf = async(claveAcceso, informacion, detallesAux, formasPagoAux, adi
         detalles.push(detalle);
     }
     let pathTemplate = path.resolve(__dirname, `../assets/templates/pdf-template.html`);
+    let pathLogo = path.resolve(__dirname, `../assets/templates/logo.png`);
     let html = fs.readFileSync(pathTemplate, 'utf8');
+    pathLogo = `file: ${pathLogo}`;
+    html = html.split('logo.png').join(pathLogo);
+    html = html.split('claveBarcode').join(claveAcceso);
     let options = {
         format: 'A4',
         orientation: 'portrait'
@@ -492,6 +501,7 @@ let consultarCliente = async(identificacion) => {
 }
 
 let cargarInformacion = async(facturaDB, clienteFactura2) => {
+    var tipoIdentificacionComp = await getTipoIdentificacionCodigo(facturaDB.tipoIdentificacionComprador);
     var informacion = {
         razonSocial: facturaDB.razonSocial,
         ruc: facturaDB.ruc,
@@ -501,10 +511,10 @@ let cargarInformacion = async(facturaDB, clienteFactura2) => {
         contribuyenteEspecial: facturaDB.contribuyenteEspecial,
         obligadoContabilidad: facturaDB.obligadoContabilidad,
         claveAcceso: facturaDB.claveAcceso,
-        ambiente: facturaDB.ambiente,
-        tipoEmision: facturaDB.tipoEmision,
+        ambiente: facturaDB.ambiente === '1' ? 'PRUEBAS' : 'PRODUCCION',
+        tipoEmision: facturaDB.tipoEmision === '1' ? 'NORMAL' : '',
         razonCliente: facturaDB.razonSocialComprador,
-        tipoIdentificacionCliente: facturaDB.tipoIdentificacionComprador,
+        tipoIdentificacionCliente: tipoIdentificacionComp.tipoIdentificacion,
         identificacionCliente: facturaDB.identificacionComprador,
         direccionCliente: clienteFactura2.direccion,
         telefonoCliente: clienteFactura2.telefono,

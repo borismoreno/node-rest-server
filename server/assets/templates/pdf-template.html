@@ -3,11 +3,6 @@
 
 <head>
     <style>
-        @font-face {
-            font-family: SourceSansPro;
-            src: local(SourceSansPro-Regular), url(SourceSansPro-Regular.ttf);
-        }
-        
         .clearfix:after {
             content: "";
             display: table;
@@ -327,6 +322,7 @@
             text-align: center;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/jsbarcode/3.5.8/JsBarcode.all.min.js"></script>
     <meta charset="utf-8">
     <title>Example 2</title>
 </head>
@@ -359,8 +355,17 @@
                 <div class="name">Ambiente: {{informacion.ambiente}}</div>
                 <div class="name">Emision: {{informacion.tipoEmision}}</div>
                 <div class="name">Clave de acceso</div>
+                <canvas id="barcode"></canvas>
+                <script>
+                    JsBarcode("#barcode", "claveBarcode", {
+                        lineColor: "#555555",
+                        fontSize: 10,
+                        width: 1,
+                        height: 30,
+                        displayValue: true
+                    });
+                </script>
             </div>
-        </div>
     </header>
     <main>
         <div id="datos" class="clearfix">

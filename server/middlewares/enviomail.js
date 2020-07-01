@@ -43,10 +43,15 @@ let envioMail = async(claveAcceso, res) => {
                     rawMessage: message
                 },
                 function(err, data, respuesta) {
-                    const { statusCode, statusMessage, body } = respuesta;
-                    if (err)
-                        res.send(err);
-                    else {
+
+                    if (err) {
+                        console.log(err);
+                        res.status(500).json({
+                            ok: false,
+                            err
+                        });
+                    } else {
+                        const { statusCode, statusMessage, body } = respuesta;
                         res.sendFile(pdf_path);
                         //borraArchivos(claveAcceso);
                         // res.status(200).json({
