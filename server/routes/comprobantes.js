@@ -65,51 +65,60 @@ let firma = async(clave, res) => {
             "</SOAP-ENV:Envelope>";
         // usage of module
         (async() => {
-            console.log('URL:', url);
-            console.log('XML:', xml);
-            const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
-            const { body, statusCode } = response;
-            console.log('Respuesta recpecion:', response);
-            console.log('Respuesta statusCode:', statusCode);
-            console.log('Respuesta body:', body);
-            if (statusCode == '200') {
-                setTimeout(() => {
-                    url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
-                    xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                        " <SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
-                        " xmlns:ns1=\"http://ec.gob.sri.ws.autorizacion\">" +
-                        "  <SOAP-ENV:Body>" +
-                        "    <ns1:autorizacionComprobante>" +
-                        "      <claveAccesoComprobante>" + clave + "</claveAccesoComprobante>" +
-                        "    </ns1:autorizacionComprobante>" +
-                        "  </SOAP-ENV:Body>" +
-                        "</SOAP-ENV:Envelope>";
-                    (async() => {
-                        const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
-                        const { body, statusCode } = response;
-                        let resultado = body.toString();
-                        // console.log(resultado);
-                        let respuestaAutorizacion = await GetRespuestaAutorizacion(resultado);
-                        if (respuestaAutorizacion.estadoRespuesta === 'AUTORIZADO') {
-                            var xmlString = '<?xml version=\"1.0\" encoding=\"UTF-8\"?><autorizacion>' +
-                                `<estado>${respuestaAutorizacion.estadoRespuesta}</estado>` +
-                                `<numeroAutorizacion>${respuestaAutorizacion.numeroAutorizacion}</numeroAutorizacion>` +
-                                `<fechaAutorizacion>${respuestaAutorizacion.fechaAutorizacion}</fechaAutorizacion>` +
-                                `<comprobante><![CDATA[${respuestaAutorizacion.comprobante.split('&lt;').join('<')}]]></comprobante>` +
-                                `</autorizacion>`;
-                            let pathXML = path.resolve(__dirname, `../../uploads/${clave}.xml`);
-                            fs.writeFileSync(pathXML, xmlString);
-                        }
-                        // res.status(200).json({
-                        //     ok: true,
-                        //     message: 'Factura Generada',
-                        //     body
-                        // });
-                        await envioMail(clave, res);
-                        //borraArchivo(clave);
-                    })();
-                }, 3000);
+            try {
+                const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
+                const { body, statusCode } = response;
+                console.log('Respuesta recpecion:', response);
+                console.log('Respuesta statusCode:', statusCode);
+                console.log('Respuesta body:', body);
+                if (statusCode == '200') {
+                    setTimeout(() => {
+                        url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
+                        xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                            " <SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
+                            " xmlns:ns1=\"http://ec.gob.sri.ws.autorizacion\">" +
+                            "  <SOAP-ENV:Body>" +
+                            "    <ns1:autorizacionComprobante>" +
+                            "      <claveAccesoComprobante>" + clave + "</claveAccesoComprobante>" +
+                            "    </ns1:autorizacionComprobante>" +
+                            "  </SOAP-ENV:Body>" +
+                            "</SOAP-ENV:Envelope>";
+                        (async() => {
+                            const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
+                            const { body, statusCode } = response;
+                            let resultado = body.toString();
+                            // console.log(resultado);
+                            let respuestaAutorizacion = await GetRespuestaAutorizacion(resultado);
+                            if (respuestaAutorizacion.estadoRespuesta === 'AUTORIZADO') {
+                                var xmlString = '<?xml version=\"1.0\" encoding=\"UTF-8\"?><autorizacion>' +
+                                    `<estado>${respuestaAutorizacion.estadoRespuesta}</estado>` +
+                                    `<numeroAutorizacion>${respuestaAutorizacion.numeroAutorizacion}</numeroAutorizacion>` +
+                                    `<fechaAutorizacion>${respuestaAutorizacion.fechaAutorizacion}</fechaAutorizacion>` +
+                                    `<comprobante><![CDATA[${respuestaAutorizacion.comprobante.split('&lt;').join('<')}]]></comprobante>` +
+                                    `</autorizacion>`;
+                                let pathXML = path.resolve(__dirname, `../../uploads/${clave}.xml`);
+                                fs.writeFileSync(pathXML, xmlString);
+                            }
+                            // res.status(200).json({
+                            //     ok: true,
+                            //     message: 'Factura Generada',
+                            //     body
+                            // });
+                            await envioMail(clave, res);
+                            //borraArchivo(clave);
+                        })();
+                    }, 3000);
+                }
+            } catch (error) {
+                console.log('entro catch');
+                console.log('Este es el error: ', error);
+                var respuestaFirma = {
+                    ok: 'false',
+                    error
+                }
+                return respuestaFirma
             }
+
         })();
     }, false);
     return 0;
@@ -490,7 +499,8 @@ let guardarFactura = async(body, usuario, res) => {
     let pathXML = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
     await actualizarSecuencial(empresaDB._id);
     fs.writeFileSync(pathXML, xmlGenerado);
-    let respuesta = await firma(claveAcceso, res)
+    let respuesta = await firma(claveAcceso, res);
+    console.log('Respuesta firma: ', respuesta);
     let identificacion = facturaDB.identificacionComprador;
     // let clienteDB = await consultarCliente(identificacion);
     let informacionPdf = await cargarInformacion(facturaDB, clienteEmision);

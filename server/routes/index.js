@@ -13,5 +13,6 @@ app.use(require('./empresa'));
 app.use(require('./configuracion'));
 app.use(require('./cliente'));
 app.use(require('./comprobantes'));
+app.use(require('./bot'));
 
 module.exports = app;
