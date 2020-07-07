@@ -13,6 +13,7 @@ restService.use(
 restService.use(bodyParser.json());
 
 restService.post("/echo", function(req, res) {
+    console.log(req.body.queryResult);
     var speech =
         req.body.queryResult &&
         req.body.queryResult.parameters &&

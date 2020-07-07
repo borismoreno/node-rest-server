@@ -40,8 +40,8 @@ function borraArchivo(claveAcceso) {
     }
 }
 
-let firma = async(clave, res) => {
-    var p12_path = path.resolve(__dirname, '../../uploads/certificados/boris_marco_moreno_guallichico.p12');
+let firma = async(clave, res, claveFirma, pathCertificado) => {
+    var p12_path = path.resolve(__dirname, `../../uploads/certificados/${pathCertificado}`);
     var facturaPath = path.resolve(__dirname, `../../uploads/${clave}.xml`);
     let infoAFirmar = await leerXML(facturaPath);
     var p12File = new File(p12_path, 'binary');
@@ -52,7 +52,7 @@ let firma = async(clave, res) => {
 
     await reader.addEventListener('loadend', function(e) {
         arrayBuffer = reader.result;
-        var comprobanteFirmado = firmarComprobante(arrayBuffer, 'Mateito810', infoAFirmar);
+        var comprobanteFirmado = firmarComprobante(arrayBuffer, claveFirma, infoAFirmar);
         let url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantesOffline?wsdl';
         let xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
             " <SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
@@ -68,9 +68,6 @@ let firma = async(clave, res) => {
             try {
                 const { response } = await soapRequest({ url: url, xml: xml, timeout: 30000 }); // Optional timeout parameter(milliseconds)
                 const { body, statusCode } = response;
-                console.log('Respuesta recpecion:', response);
-                console.log('Respuesta statusCode:', statusCode);
-                console.log('Respuesta body:', body);
                 if (statusCode == '200') {
                     setTimeout(() => {
                         url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
@@ -197,16 +194,16 @@ let guardarDetallesFactura = async(body, facturaDB) => {
             precioUnitario: body.detalles[i].precioUnitario,
             descuento: body.detalles[i].valorDescuento,
             totalSinImpuesto: body.detalles[i].valorTotal,
+            valorImpuesto: body.detalles[i].valorImpuesto,
             emitidaRecibida: 'EMI'
         });
         det = await guardarDetalle(detalleFacturaEmitida);
-        let valorImp = Number(det.totalSinImpuesto) * 0.12;
         impuestoComprobanteDet = new ImpuestoComprobante({
             impuestoPadre: det._id,
             codigoImpuesto: '2',
             codigoPorcentaje: '2',
             baseImponible: det.totalSinImpuesto,
-            valor: valorImp,
+            valor: det.valorImpuesto,
             tarifa: '12',
             tipoImpuesto: 'DET',
             emitidaRecibida: 'EMI'
@@ -280,13 +277,14 @@ let crearXML = (facturaEmitida, impuestoComprobante, formasPagoFactura, detalles
         }
         impues.push(im);
     }
-
-    for (let k = 0; k < datosAdicionales.length; k++) {
-        let dat = {
-            '@nombre': datosAdicionales[k].nombreAdicional,
-            '#text': datosAdicionales[k].valorAdicional
+    if (Array.isArray(datosAdicionales) && datosAdicionales.length) {
+        for (let k = 0; k < datosAdicionales.length; k++) {
+            let dat = {
+                '@nombre': datosAdicionales[k].nombreAdicional,
+                '#text': datosAdicionales[k].valorAdicional
+            }
+            datos.push(dat);
         }
-        datos.push(dat);
     }
 
     for (let j = 0; j < detalles.length; j++) {
@@ -358,8 +356,10 @@ let crearXML = (facturaEmitida, impuestoComprobante, formasPagoFactura, detalles
             detalles: {
                 detalle: details
             },
-            infoAdicional: {
-                campoAdicional: datos
+            ...(Array.isArray(datos) && datos.length) && {
+                infoAdicional: {
+                    campoAdicional: datos
+                }
             }
         })
         .end({ pretty: true });
@@ -380,12 +380,14 @@ let generarPdf = async(claveAcceso, informacion, detallesAux, formasPagoAux, adi
 
     }
 
-    for (let j = 0; j < adicionalesAux.length; j++) {
-        let adicion = {
-            nombreAdicional: adicionalesAux[j].nombreAdicional,
-            valorAdicional: adicionalesAux[j].valorAdicional
+    if (Array.isArray(adicionalesAux) && adicionalesAux.length) {
+        for (let j = 0; j < adicionalesAux.length; j++) {
+            let adicion = {
+                nombreAdicional: adicionalesAux[j].nombreAdicional,
+                valorAdicional: adicionalesAux[j].valorAdicional
+            }
+            adicionales.push(adicion);
         }
-        adicionales.push(adicion);
     }
 
     for (let k = 0; k < detallesAux.length; k++) {
@@ -494,13 +496,15 @@ let guardarFactura = async(body, usuario, res) => {
     let impuesto = await guardarImpuestoComprobante(impuestoComprobante);
     let detalles = await guardarDetallesFactura(body, facturaDB);
     let formasPago = await guardarFormasPago(body.formasPago, facturaDB);
-    let datosAdicionales = await guardarDatosAdicionales(body.datosAdicionales, facturaDB);
+    let datosAdicionales;
+    if (Array.isArray(body.datosAdicionales) && body.datosAdicionales.length) {
+        datosAdicionales = await guardarDatosAdicionales(body.datosAdicionales, facturaDB);
+    }
     let xmlGenerado = crearXML(facturaDB, impuesto, formasPago, detalles, datosAdicionales);
     let pathXML = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
     await actualizarSecuencial(empresaDB._id);
     fs.writeFileSync(pathXML, xmlGenerado);
-    let respuesta = await firma(claveAcceso, res);
-    console.log('Respuesta firma: ', respuesta);
+    let respuesta = await firma(claveAcceso, res, empresaDB.claveFirma, empresaDB.pathCertificado);
     let identificacion = facturaDB.identificacionComprador;
     // let clienteDB = await consultarCliente(identificacion);
     let informacionPdf = await cargarInformacion(facturaDB, clienteEmision);

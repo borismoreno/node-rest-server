@@ -14,6 +14,7 @@ var detalleFacturaEmitidaSchema = new Schema({
     precioUnitario: { type: String, required: true },
     descuento: { type: String, required: true },
     totalSinImpuesto: { type: String, required: true },
+    valorImpuesto: { type: String, required: true },
     emitidaRecibida: { type: String, required: true, enum: emitidaRecibidaValidos }
 });
 
