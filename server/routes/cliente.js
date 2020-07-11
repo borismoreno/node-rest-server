@@ -96,8 +96,7 @@ app.put('/cliente/:id', verificaToken, (req, res) => {
 });
 
 // Obtener todos los clientes
-app.get('/cliente', (req, res) => {
-    //app.get('/cliente', [verificaToken], (req, res) => {
+app.get('/cliente', [verificaToken], (req, res) => {
     Cliente.find({ activo: true })
         .populate('tipoIdentificacion', 'tipoIdentificacion codigo')
         .exec((err, clientes) => {
