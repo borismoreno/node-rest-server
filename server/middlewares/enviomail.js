@@ -12,7 +12,8 @@ let envioMail = async(claveAcceso, res) => {
     let datos = await obtenerDatos(claveAcceso);
 
     var email = `${datos.empresa.nombreNotificacion} <${datos.empresa.mailEnvioComprobantes}>`;
-    var emailEnvio = datos.cliente.mail;
+    var emailEnvio = 'inmain.comprobantes@gmail.com';
+    // var emailEnvio = datos.cliente.mail;
 
     mailComposer({
         from: email,

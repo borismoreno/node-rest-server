@@ -12,7 +12,7 @@
     "dependencies": {
         "aws-sdk": "^2.706.0",
         "axios": "^0.19.2",
-        "bcrypt": "^4.0.1",
+        "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
         "btoa": "^1.2.1",
         "canvas": "^2.6.1",
@@ -30,7 +30,6 @@
         "mongoose-unique-validator": "^2.0.3",
         "node-forge": "^0.9.1",
         "node-ses": "^3.0.2",
-        "nodemailer": "^6.4.8",
         "pdf-creator-node": "^1.4.1",
         "soap": "^0.31.0",
         "underscore": "^1.10.2",
