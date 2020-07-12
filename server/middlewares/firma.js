@@ -3,29 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const btoa = require('btoa');
 const moment = require('moment');
-const { resolve } = require('path');
-const { reject } = require('underscore');
 const FileAPI = require('file-api'),
     File = FileAPI.File,
     FileReader = FileAPI.FileReader;
-
-// let firma = async(clave, claveFirma, pathCertificado) => {
-//     var p12_path = path.resolve(__dirname, `../../uploads/certificados/${pathCertificado}`);
-//     var facturaPath = path.resolve(__dirname, `../../uploads/${clave}.xml`);
-//     let infoAFirmar = await leerXML(facturaPath);
-//     var p12File = new File(p12_path, 'binary');
-
-//     var reader = new FileReader();
-//     var arrayBuffer = null;
-//     let respuesta;
-//     console.log('antes');
-//     await reader.addEventListener('loadend', function(e) {
-//         arrayBuffer = reader.result;
-//         respuesta = firmarComprobante(arrayBuffer, claveFirma, infoAFirmar);
-//     }, false);
-//     reader.readAsArrayBuffer(p12File);
-//     return respuesta;
-// }
 
 let firma = async(clave, claveFirma, pathCertificado) => {
     return new Promise((resolve, reject) => {
@@ -285,8 +265,7 @@ function firmarComprobante(mi_contenido_p12, mi_pwd_p12, comprobante) {
         //FIN DE LA FIRMA DIGITAL 
         return comprobante.replace(/(<[^<]+)$/, xades_bes + '$1');
     } catch (error) {
-        console.log('entro catch');
-        console.log('Este es el error: ', error);
+        console.log('Error al generar la firma: ', error);
         var respuestaFirma = {
             ok: 'false',
             error

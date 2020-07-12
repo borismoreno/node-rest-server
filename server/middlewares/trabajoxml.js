@@ -108,70 +108,74 @@ let crearXML = async(facturaEmitida, impuestoComprobante, formasPagoFactura, det
 }
 
 let generarPdf = async(claveAcceso, facturaDB, clienteEmision, detallesAux, formasPagoAux, adicionalesAux, res) => {
-    let informacion = await cargarInformacion(facturaDB, clienteEmision);
-    let formasPago = [];
-    let detalles = [];
-    let adicionales = [];
-    for (let i = 0; i < formasPagoAux.length; i++) {
-        let forma = {
-            formaPago: formasPagoAux[i].formaPagoDescripcion,
-            total: formasPagoAux[i].total
-        }
-        formasPago.push(forma);
-
-    }
-
-    if (Array.isArray(adicionalesAux) && adicionalesAux.length) {
-        for (let j = 0; j < adicionalesAux.length; j++) {
-            let adicion = {
-                nombreAdicional: adicionalesAux[j].nombreAdicional,
-                valorAdicional: adicionalesAux[j].valorAdicional
+    try {
+        let informacion = await cargarInformacion(facturaDB, clienteEmision);
+        let formasPago = [];
+        let detalles = [];
+        let adicionales = [];
+        for (let i = 0; i < formasPagoAux.length; i++) {
+            let forma = {
+                formaPago: formasPagoAux[i].formaPagoDescripcion,
+                total: formasPagoAux[i].total
             }
-            adicionales.push(adicion);
-        }
-    }
+            formasPago.push(forma);
 
-    for (let k = 0; k < detallesAux.length; k++) {
-        let detalle = {
-            codigoPrincipal: detallesAux[k].det.codigoPrincipal,
-            descripcion: detallesAux[k].det.descripcion,
-            cantidad: detallesAux[k].det.cantidad,
-            precioUnitario: detallesAux[k].det.precioUnitario,
-            totalSinImpuesto: detallesAux[k].det.totalSinImpuesto
         }
-        detalles.push(detalle);
-    }
-    let pathTemplate = path.resolve(__dirname, `../assets/templates/pdf-template.html`);
-    let pathLogo = path.resolve(__dirname, `../assets/templates/logo.png`);
-    let html = fs.readFileSync(pathTemplate, 'utf8');
-    pathLogo = `file: ${pathLogo}`;
-    html = html.split('logo.png').join(pathLogo);
-    html = html.split('claveBarcode').join(claveAcceso);
-    let options = {
-        format: 'A4',
-        orientation: 'portrait'
-    };
-    let pathImg = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
-    let document = {
-        html: html,
-        data: {
-            informacion,
-            detalles,
-            formasPago,
-            adicionales
-        },
-        path: pathImg
-    };
-    pdf.create(document, options)
-        .then(respuesta => {
-            res.sendFile(pathImg);
-        })
-        .catch(error => {
-            res.status(500).json({
-                ok: false,
-                error
+
+        if (Array.isArray(adicionalesAux) && adicionalesAux.length) {
+            for (let j = 0; j < adicionalesAux.length; j++) {
+                let adicion = {
+                    nombreAdicional: adicionalesAux[j].nombreAdicional,
+                    valorAdicional: adicionalesAux[j].valorAdicional
+                }
+                adicionales.push(adicion);
+            }
+        }
+
+        for (let k = 0; k < detallesAux.length; k++) {
+            let detalle = {
+                codigoPrincipal: detallesAux[k].det.codigoPrincipal,
+                descripcion: detallesAux[k].det.descripcion,
+                cantidad: detallesAux[k].det.cantidad,
+                precioUnitario: detallesAux[k].det.precioUnitario,
+                totalSinImpuesto: detallesAux[k].det.totalSinImpuesto
+            }
+            detalles.push(detalle);
+        }
+        let pathTemplate = path.resolve(__dirname, `../assets/templates/pdf-template.html`);
+        let pathLogo = path.resolve(__dirname, `../assets/templates/logo.png`);
+        let html = fs.readFileSync(pathTemplate, 'utf8');
+        pathLogo = `file: ${pathLogo}`;
+        html = html.split('logo.png').join(pathLogo);
+        html = html.split('claveBarcode').join(claveAcceso);
+        let options = {
+            format: 'A4',
+            orientation: 'portrait'
+        };
+        let pathImg = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
+        let document = {
+            html: html,
+            data: {
+                informacion,
+                detalles,
+                formasPago,
+                adicionales
+            },
+            path: pathImg
+        };
+        pdf.create(document, options)
+            .then(respuesta => {
+                res.sendFile(pathImg);
+            })
+            .catch(error => {
+                return res.status(500).json({
+                    ok: false,
+                    message: error
+                });
             });
-        });
+    } catch (error) {
+        throw (new Error(`Error al generar el pdf-${error}`));
+    }
 }
 
 let cargarInformacion = async(facturaDB, clienteFactura2) => {

@@ -1,11 +1,12 @@
 let FacturaEmitida = require('../models/facturaemitida');
+let ErrorRegistro = require('../models/errorregistro');
 const path = require('path');
 const fs = require('fs');
 const mailComposer = require('mailcomposer');
 var nodeses = require('node-ses'),
     client = nodeses.createClient({ key: process.env.API_KEY_SES, secret: process.env.SECRET_SES });
 
-let envioMail = async(claveAcceso) => {
+let envioMail = async(claveAcceso, facturaDB) => {
     var pdf_path = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
     var xml_path = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
 
@@ -46,8 +47,18 @@ let envioMail = async(claveAcceso) => {
                 function(err, data, respuesta) {
 
                     if (err) {
-                        console.log(err);
+                        console.log('error envio mail: ', err);
+                        let idFactura = '0';
+                        if (facturaDB !== undefined) { idFactura = facturaDB._id }
+                        let nuevoError = new ErrorRegistro({
+                            facturaEmitida: idFactura,
+                            mensajeError: `Error al enviar el mail-${err.Message}`,
+                            fechaCreacion: new Date()
+                        });
+                        nuevoError.save();
                     } else {
+                        facturaDB.estadoComprobante = 'EMA';
+                        facturaDB.save();
                         // const { statusCode, statusMessage, body } = respuesta;
                         // res.sendFile(pdf_path);
                         borraArchivos(claveAcceso);
