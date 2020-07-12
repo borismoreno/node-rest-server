@@ -5,7 +5,7 @@ const mailComposer = require('mailcomposer');
 var nodeses = require('node-ses'),
     client = nodeses.createClient({ key: process.env.API_KEY_SES, secret: process.env.SECRET_SES });
 
-let envioMail = async(claveAcceso, res) => {
+let envioMail = async(claveAcceso) => {
     var pdf_path = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
     var xml_path = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);
 
@@ -37,7 +37,7 @@ let envioMail = async(claveAcceso, res) => {
         ],
     }).build((err, message) => {
         if (err) {
-            res.send(err);
+            console.log(err);
         } else {
             client.sendRawEmail({
                     from: email,
@@ -47,14 +47,10 @@ let envioMail = async(claveAcceso, res) => {
 
                     if (err) {
                         console.log(err);
-                        res.status(500).json({
-                            ok: false,
-                            err
-                        });
                     } else {
-                        const { statusCode, statusMessage, body } = respuesta;
-                        res.sendFile(pdf_path);
-                        //borraArchivos(claveAcceso);
+                        // const { statusCode, statusMessage, body } = respuesta;
+                        // res.sendFile(pdf_path);
+                        borraArchivos(claveAcceso);
                         // res.status(200).json({
                         //     ok: true,
                         //     message: 'Factura Generada',
