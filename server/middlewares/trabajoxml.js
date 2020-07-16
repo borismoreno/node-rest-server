@@ -180,6 +180,7 @@ let generarPdf = async(claveAcceso, facturaDB, clienteEmision, detallesAux, form
 
 let cargarInformacion = async(facturaDB, clienteFactura2) => {
     var tipoIdentificacionComp = await getTipoIdentificacionCodigo(facturaDB.tipoIdentificacionComprador);
+    let emailEnviar = clienteFactura2.mail.split(',').join(' \r\n');
     let date = new Date();
     let mes = '';
     let day = date.getDate();
@@ -246,7 +247,7 @@ let cargarInformacion = async(facturaDB, clienteFactura2) => {
         identificacionCliente: facturaDB.identificacionComprador,
         direccionCliente: clienteFactura2.direccion,
         telefonoCliente: clienteFactura2.telefono,
-        emailCliente: clienteFactura2.mail,
+        emailCliente: emailEnviar,
         fecha: fechaPresentar,
         subTotalDoce: facturaDB.totalSinImpuestos,
         valorIva: facturaDB.totalIva,
