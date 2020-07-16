@@ -248,7 +248,7 @@ let cargarInformacion = async(facturaDB, clienteFactura2) => {
         direccionCliente: clienteFactura2.direccion,
         telefonoCliente: clienteFactura2.telefono,
         emailCliente: emailEnviar,
-        fecha: fechaPresentar,
+        fecha: facturaDB.fechaEmision,
         subTotalDoce: facturaDB.totalSinImpuestos,
         valorIva: facturaDB.totalIva,
         valorTotal: facturaDB.importeTotal
