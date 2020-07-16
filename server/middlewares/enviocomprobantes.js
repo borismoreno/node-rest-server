@@ -49,10 +49,13 @@ let envioComprobante = async(ambiente, comprobanteFirmado, facturaDB) => {
     });
 }
 
-let obtenerAutorizacion = async(clave, facturaDB) => {
+let obtenerAutorizacion = async(ambiente, clave, facturaDB) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
+            let url = 'https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
+            if (ambiente === 2) {
+                url = 'https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl';
+            }
             xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                 " <SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"" +
                 " xmlns:ns1=\"http://ec.gob.sri.ws.autorizacion\">" +

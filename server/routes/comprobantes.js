@@ -99,7 +99,7 @@ let guardarFactura = async(body, usuario, res) => {
         let respEnvio = await envioComprobante(empresaDB.ambiente, respuesta, facturaDB);
         let respAutorizacion;
         if (respEnvio.ok === 'true' && respEnvio.statusCode === 200) {
-            respAutorizacion = await obtenerAutorizacion(claveAcceso, facturaDB);
+            respAutorizacion = await obtenerAutorizacion(empresaDB.ambiente, claveAcceso, facturaDB);
             if (respAutorizacion === 'AUTORIZADO') {
                 envioMail(claveAcceso, facturaDB);
             }
