@@ -6,7 +6,7 @@ const { firma } = require('../middlewares/firma');
 const { envioComprobante, obtenerAutorizacion } = require('../middlewares/enviocomprobantes');
 const fs = require('fs');
 const path = require('path');
-const pdf = require('pdf-creator-node');
+const moment = require('moment');
 app = express();
 
 let FacturaEmitida = require('../models/facturaemitida');
@@ -67,7 +67,7 @@ let guardarFactura = async(body, usuario, res) => {
             importeTotal: body.detalleValores.totalGeneral,
             moneda: 'DOLAR',
             estadoComprobante: 'PPR',
-            fechaRegistro: new Date(),
+            fechaRegistro: moment().format('YYYY-MM-DD\THH:mm:ssZ'),
             usuario: usuario._id,
             empresa: empresaDB._id,
             cliente: clienteEmision._id
@@ -111,7 +111,7 @@ let guardarFactura = async(body, usuario, res) => {
         let nuevoError = new ErrorRegistro({
             facturaEmitida: idFactura,
             mensajeError: err,
-            fechaCreacion: new Date()
+            fechaCreacion: moment().format('YYYY-MM-DD\THH:mm:ssZ')
         });
         await nuevoError.save();
         return res.status(500).json({

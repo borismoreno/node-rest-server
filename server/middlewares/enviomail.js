@@ -60,7 +60,7 @@ let envioMail = async(claveAcceso, facturaDB) => {
                         facturaDB.save();
                         // const { statusCode, statusMessage, body } = respuesta;
                         // res.sendFile(pdf_path);
-                        borraArchivos(claveAcceso);
+                        borraArchivos(claveAcceso, facturaDB);
                         // res.status(200).json({
                         //     ok: true,
                         //     message: 'Factura Generada',
@@ -75,10 +75,22 @@ let envioMail = async(claveAcceso, facturaDB) => {
     });
 }
 
-let borraArchivos = async(claveAcceso) => {
-    let pathPdf = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
-    if (fs.existsSync(pathPdf)) {
-        fs.unlinkSync(pathPdf);
+let borraArchivos = async(claveAcceso, facturaDB) => {
+    try {
+        let pathPdf = path.resolve(__dirname, `../../uploads/${claveAcceso}.pdf`);
+        if (fs.existsSync(pathPdf)) {
+            fs.unlinkSync(pathPdf);
+        }
+    } catch (err) {
+        console.log('error al borrar archivo: ', err);
+        let idFactura = '0';
+        if (facturaDB !== undefined) { idFactura = facturaDB._id }
+        let nuevoError = new ErrorRegistro({
+            facturaEmitida: idFactura,
+            mensajeError: `Error al borrar archivo-${err}`,
+            fechaCreacion: new Date()
+        });
+        nuevoError.save();
     }
 
     // let pathXml = path.resolve(__dirname, `../../uploads/${claveAcceso}.xml`);

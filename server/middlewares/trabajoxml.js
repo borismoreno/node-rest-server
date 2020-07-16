@@ -3,6 +3,7 @@ let TipoIdentificacion = require('../models/tipoIdentificacion');
 const path = require('path');
 const pdf = require('pdf-creator-node');
 const fs = require('fs');
+const moment = require('moment');
 
 let crearXML = async(facturaEmitida, impuestoComprobante, formasPagoFactura, detalles, datosAdicionales) => {
     let impues = [];
@@ -180,48 +181,47 @@ let generarPdf = async(claveAcceso, facturaDB, clienteEmision, detallesAux, form
 
 let cargarInformacion = async(facturaDB, clienteFactura2) => {
     var tipoIdentificacionComp = await getTipoIdentificacionCodigo(facturaDB.tipoIdentificacionComprador);
-    let emailEnviar = clienteFactura2.mail.split(',').join(' \r\n');
-    let date = new Date();
+    let emailEnviar = clienteFactura2.mail.split(',').join('\n');
     let mes = '';
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
+    let day = moment().format('DD');
+    let month = moment().format('MM');
+    let year = moment().format('YYYY');
 
     switch (month) {
-        case 1:
+        case '01':
             mes = 'Enero'
             break;
-        case 2:
+        case '02':
             mes = 'Febrero'
             break;
-        case 3:
+        case '03':
             mes = 'Marzo'
             break;
-        case 4:
+        case '04':
             mes = 'Abril'
             break;
-        case 5:
+        case '05':
             mes = 'Mayo'
             break;
-        case 6:
+        case '06':
             mes = 'Junio'
             break;
-        case 7:
+        case '07':
             mes = 'Julio'
             break;
-        case 8:
+        case '08':
             mes = 'Agosto'
             break;
-        case 9:
+        case '09':
             mes = 'Septiembre'
             break;
-        case 10:
+        case '10':
             mes = 'Octubre'
             break;
-        case 11:
+        case '11':
             mes = 'Noviembre'
             break;
-        case 12:
+        case '12':
             mes = 'Diciembre'
             break;
         default:
