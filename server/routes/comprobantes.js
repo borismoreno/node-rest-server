@@ -29,6 +29,7 @@ let guardarFactura = async(body, usuario, res) => {
     let facturaDB;
     try {
         let pad = '000000000';
+        let padSecuencia = '00000000';
         let fecha = body.fechaEmision.split('/');
         let impuestoComprobante = new ImpuestoComprobante();
         let fechaAuxiliar = `${fecha[2]}/${fecha[1]}/${fecha[0]}`;
@@ -36,10 +37,12 @@ let guardarFactura = async(body, usuario, res) => {
         let tipoIdentificacion = await getTipoIdentificacion(body.cliente.tipoIdentificacion);
         let clienteEmision = await consultarCliente(body.cliente.numeroIdentificacion);
         let secuencial = pad.substring(0, pad.length - empresaDB.secuencialFactura.length) + empresaDB.secuencialFactura;
+        let numeroFacturas = await getNumeroFacturasEmitidas();
+        let aleatorio = padSecuencia.substring(0, padSecuencia.length - numeroFacturas.toString().length) + numeroFacturas.toString();
         let claveAcceso = fecha[2] + fecha[1] + fecha[0] +
             '01' + empresaDB.ruc + empresaDB.ambiente + empresaDB.establecimiento + empresaDB.puntoEmision +
             secuencial +
-            '00000001' + empresaDB.tipoEmision;
+            aleatorio + empresaDB.tipoEmision;
         claveAcceso = claveAcceso + obtenerSumaPorDigitos(invertirCadena(claveAcceso));
         let factura = new FacturaEmitida({
             ambiente: empresaDB.ambiente,
@@ -127,6 +130,14 @@ let getEmpresa = async(id) => {
         empresa = empresaDB;
     });
     return empresa;
+}
+
+let getNumeroFacturasEmitidas = async() => {
+    let numero;
+    await FacturaEmitida.countDocuments((err, conteo) => {
+        numero = conteo;
+    });
+    return numero;
 }
 
 let getTipoIdentificacion = async(tipoIdentificacion) => {

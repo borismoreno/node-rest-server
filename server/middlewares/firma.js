@@ -66,7 +66,6 @@ function firmarComprobante(mi_contenido_p12, mi_pwd_p12, comprobante) {
         exponent = hexToBase64(key.e.data[0].toString(16));
         modulus = bigint2base64(key.n);
 
-
         var sha1_comprobante = sha1_base64(comprobante.replace('<?xml version="1.0" encoding="UTF-8"?>\n', ''));
         var xmlns = 'xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:etsi="http://uri.etsi.org/01903/v1.3.2#"';
 

@@ -1,11 +1,12 @@
 const express = require('express');
 const { verificaToken, verificaAdminRol } = require('../middlewares/autenticacion');
+const { verificaIdentificacion } = require('../middlewares/validadoridentificacion');
 app = express();
 
 let Cliente = require('../models/cliente');
 
 // Crear un cliente
-app.post('/cliente', [verificaToken], (req, res) => {
+app.post('/cliente', [verificaToken, verificaIdentificacion], (req, res) => {
     let body = req.body;
     let cliente = new Cliente({
         razonSocial: body.razonSocial,

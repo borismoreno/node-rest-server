@@ -84,6 +84,15 @@ let obtenerAutorizacion = async(ambiente, clave, facturaDB) => {
                         fs.writeFileSync(pathXML, xmlString);
                         facturaDB.estadoComprobante = 'AUT';
                         facturaDB.save();
+                    } else if (respuestaAutorizacion.estadoRespuesta === 'NO AUTORIZADO') {
+                        facturaDB.estadoComprobante = 'NAT';
+                        facturaDB.save();
+                        let nuevoError = new ErrorRegistro({
+                            facturaEmitida: facturaDB._id,
+                            mensajeError: `${respuestaAutorizacion.identificadorError}-${respuestaAutorizacion.mensajeErrorRespuesta}-${respuestaAutorizacion.informacionAdicional}`,
+                            fechaCreacion: new Date()
+                        });
+                        await nuevoError.save();
                     }
                 } catch (error) {
                     let idFactura = '0';
@@ -124,6 +133,7 @@ let GetRespuestaAutorizacion = async(respuesta) => {
         if ((aux1 > 0) && (aux2 > 0))
             comprobante = `${respuesta.substring(aux1 + 13, aux2)}`;
         var respuesta = {
+            ok: true,
             estadoRespuesta,
             numeroAutorizacion,
             fechaAutorizacion,
@@ -131,6 +141,30 @@ let GetRespuestaAutorizacion = async(respuesta) => {
         }
 
         return respuesta;
+    } else if (estadoRespuesta === 'NO AUTORIZADO') {
+        let identificadorError;
+        let mensajeErrorRespuesta;
+        let informacionAdicional;
+        aux1 = respuesta.indexOf('<identificador>');
+        aux2 = respuesta.indexOf('</identificador>');
+        if ((aux1 > 0) && (aux2 > 0))
+            identificadorError = `${respuesta.substring(aux1 + 15, aux2)}`;
+        aux1 = respuesta.indexOf('identificador><mensaje>');
+        aux2 = respuesta.indexOf('</mensaje>');
+        if ((aux1 > 0) && (aux2 > 0))
+            mensajeErrorRespuesta = `${respuesta.substring(aux1 + 23, aux2)}`;
+        aux1 = respuesta.indexOf('<informacionAdicional>');
+        aux2 = respuesta.indexOf('</informacionAdicional>');
+        if ((aux1 > 0) && (aux2 > 0))
+            informacionAdicional = `${respuesta.substring(aux1 + 22, aux2)}`;
+        let respuestaError = {
+            ok: false,
+            estadoRespuesta,
+            identificadorError,
+            mensajeErrorRespuesta,
+            informacionAdicional
+        }
+        return respuestaError;
     }
 }
 
