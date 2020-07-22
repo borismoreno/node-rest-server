@@ -18,6 +18,7 @@ let envioMail = async(claveAcceso, facturaDB) => {
     mailComposer({
         from: email,
         to: emailEnvio,
+        cc: email,
         subject: `Documento Electrónico Factura# ${datos.estab}-${datos.ptoEmi}-${datos.secuencial}`,
         text: `Estimado cliente ${datos.razonSocialComprador}\r\n\r\n` +
             `Nos complace adjuntar su e-factura con el siguiente detalle:\r\n\r\n` +
