@@ -34,12 +34,12 @@ app.post('/webhook', async function (req, res) {
         });
 
         try {
-            await message.save();
+            //await message.save();
             //await apiChatApi('message', {chatId, body});
         } catch (error) {
             console.log(error);
         }
-        
+
         //if(data.messages[i].fromMe)return;
         
         // if(/help/.test(body)){
