@@ -59,7 +59,7 @@ app.post('/webhook', async function (req, res) {
         }
         respuestas.push(respuesta);
     }
-    res.json(respuestas);
+    res.send('Ok');
 });
 
 async function apiChatApi(method, params){
