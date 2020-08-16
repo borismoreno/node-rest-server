@@ -35,7 +35,7 @@ app.post('/webhook', async function (req, res) {
 
         try {
             await message.save();
-            await apiChatApi('message', {chatId, body});
+            //await apiChatApi('message', {chatId, body});
         } catch (error) {
             console.log(error);
         }
