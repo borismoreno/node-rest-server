@@ -48,3 +48,21 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 process.env.SECRET_SES = secretSes;
+
+let apiChat;
+if (process.env.NODE_ENV === 'dev') {
+    apiChat = '************************';
+} else {
+    apiChat = process.env.API_CHAT;
+}
+
+process.env.API_CHAT = apiChat;
+
+let apiChatToken;
+if (process.env.NODE_ENV === 'dev') {
+    apiChatToken = '************************';
+} else {
+    apiChatToken = process.env.API_CHAT_TOKEN;
+}
+
+process.env.API_CHAT_TOKEN = apiChatToken;
