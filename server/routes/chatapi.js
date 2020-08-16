@@ -55,8 +55,17 @@ app.post('/webhook', async function (req, res) {
         });
 
         try {
-            //await message.save();
-            //await apiChatApi('message', {chatId, body});
+            await message.save();
+            let text = 'No entiendo tu mensaje'
+            if (/comenzar/.test(body.toString().toLowerCase())) {
+                text = `${senderName}, Por favor ingresa una de las siguientes opciones:\n\n1) Saldo\n2) Movimientos`;
+            } else if (/1/.test(body.toString().toLowerCase())) {
+                text = `${senderName}, Tu saldo es de $20.`;
+            } else if (/2/.test(body.toString().toLowerCase())) {
+                text = `${senderName}, Tus 2 últimos movimientos son los siguientes:\n\n-Retiro de $20.\n-Retiro de $50.`;
+            }
+            if (chatId === '593994651967@c.us' || chatId === '593984545169@c.us')
+                await apiChatApi('message', {chatId, body: text});
         } catch (error) {
             console.log(error);
         }
