@@ -22,23 +22,23 @@ app.post('/webhook', async function (req, res) {
     const data = req.body;
     let respuesta;
     const respuestas = [];
-    // console.log(JSON.stringify(data));
-    // mailComposer({
-    //     from: 'borismoreno84@gmail.com',
-    //     to: 'boris_marco_moreno@hotmail.com',
-    //     subject: 'Mensajes',
-    //     text: JSON.stringify(data)
-    // }).build((err, mensaje) => {
-    //     if (err) {
-    //         //console.log(err);
-    //     } else {
-    //         client.sendRawEmail({
-    //             from: 'borismoreno84@gmail.com',
-    //             rawMessage: mensaje
-    //         },
-    //         function(err, data, respuesta) {});
-    //     }
-    // })
+    console.log(JSON.stringify(data));
+    mailComposer({
+        from: 'borismoreno84@gmail.com',
+        to: 'boris_marco_moreno@hotmail.com',
+        subject: 'Mensajes',
+        text: JSON.stringify(data)
+    }).build((err, mensaje) => {
+        if (err) {
+            //console.log(err);
+        } else {
+            client.sendRawEmail({
+                from: 'borismoreno84@gmail.com',
+                rawMessage: mensaje
+            },
+            function(err, data, respuesta) {});
+        }
+    })
     let message;
     for (var i in data.messages) {
         const author = data.messages[i].author;
