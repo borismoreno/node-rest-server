@@ -72,12 +72,12 @@ async function apiChatApi(method, params){
     
     const url = `${apiUrl}/${method}?token=${token}`; 
     
-    // const apiResponse = await fetch(url, options);
-    // const jsonResponse = await apiResponse.json();
-    const jsonResponse = {
-        url,
-        options
-    }
+    const apiResponse = await fetch(url, options);
+    const jsonResponse = await apiResponse.json();
+    // const jsonResponse = {
+    //     url,
+    //     options
+    // }
     return jsonResponse;
 }
 
