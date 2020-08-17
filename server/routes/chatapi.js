@@ -65,7 +65,7 @@ app.post('/webhook', async function (req, res) {
                 } else if (/2/.test(body.toString().toLowerCase())) {
                     text = `${senderName}, Tus 2 últimos movimientos son los siguientes:\n\n-Retiro de $20.\n-Retiro de $50.`;
                 }
-                //if (chatId === '593994651967@c.us' || chatId === '593984545169@c.us')
+                if (chatId === '593994651967@c.us' || chatId === '593984545169@c.us' || chatId === '593992703156@c.us')
                     await apiChatApi('message', {chatId, body: text});
             }
         } catch (error) {
