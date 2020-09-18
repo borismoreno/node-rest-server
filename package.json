@@ -29,7 +29,7 @@
         "mongoose": "^5.9.17",
         "mongoose-unique-validator": "^2.0.3",
         "node-fetch": "^2.6.0",
-        "node-forge": "^0.9.1",
+        "node-forge": "^0.10.0",
         "node-ses": "^3.0.2",
         "pdf-creator-node": "^1.4.1",
         "soap": "^0.31.0",
