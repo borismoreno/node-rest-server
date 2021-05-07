@@ -33,7 +33,7 @@
         "node-ses": "^3.0.2",
         "pdf-creator-node": "^1.4.1",
         "soap": "^0.31.0",
-        "underscore": "^1.10.2",
+        "underscore": "^1.12.1",
         "window": "^4.2.7",
         "xml-crypto": "^1.5.3",
         "xmlbuilder": "^15.1.1"
